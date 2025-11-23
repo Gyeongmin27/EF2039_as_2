@@ -113,12 +113,26 @@ function startGame() {
 // 글자 떨어뜨리기 시작
 function startFallingLetters() {
     const letters = splitWord(gameState.currentWord);
-    const positions = ['top', 'left', 'right']; // 위, 왼쪽, 오른쪽
+    const allPositions = ['top', 'left', 'right']; // 위, 왼쪽, 오른쪽
     const speed = speedSettings[gameState.currentSpeed] || 50;
+    
+    // 글자 수만큼 방향을 랜덤으로 선택 (중복 없이)
+    const selectedPositions = [];
+    const availablePositions = [...allPositions]; // 복사본 생성
+    
+    for (let i = 0; i < letters.length; i++) {
+        if (availablePositions.length === 0) {
+            // 모든 방향을 사용했으면 다시 채움
+            availablePositions.push(...allPositions);
+        }
+        const randomIndex = Math.floor(Math.random() * availablePositions.length);
+        selectedPositions.push(availablePositions[randomIndex]);
+        availablePositions.splice(randomIndex, 1); // 선택된 방향 제거
+    }
     
     letters.forEach((letter, index) => {
         setTimeout(() => {
-            createFallingLetter(letter, positions[index % positions.length], speed);
+            createFallingLetter(letter, selectedPositions[index], speed);
         }, index * 300); // 각 글자를 약간씩 지연시켜 떨어뜨림
     });
     

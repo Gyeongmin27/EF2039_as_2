@@ -144,26 +144,31 @@ function createFallingLetter(letter, position, speed) {
     
     // 시작 위치 설정 (사각형의 가장자리에서 발사)
     let startX, startY;
+    let velocityX = 0; // 수평 초기 속도
     
     switch(position) {
         case 'top':
-            // 위쪽 중앙에서 발사
+            // 위쪽 중앙에서 발사 (수직으로만 떨어짐)
             startX = gameAreaWidth / 2;
             startY = 0;
+            velocityX = 0;
             break;
         case 'left':
-            // 왼쪽 가장자리 위에서 발사
+            // 왼쪽 가장자리 위에서 발사 (오른쪽 방향으로)
             startX = 0;
             startY = 0;
+            velocityX = 2; // 오른쪽 방향 속도
             break;
         case 'right':
-            // 오른쪽 가장자리 위에서 발사
+            // 오른쪽 가장자리 위에서 발사 (왼쪽 방향으로)
             startX = gameAreaWidth;
             startY = 0;
+            velocityX = -2; // 왼쪽 방향 속도
             break;
         default:
             startX = gameAreaWidth / 2;
             startY = 0;
+            velocityX = 0;
     }
     
     letterElement.style.left = startX + 'px';
@@ -174,26 +179,34 @@ function createFallingLetter(letter, position, speed) {
     gameState.fallingLetters.push(letterElement);
     
     // 중력 시뮬레이션을 위한 물리 변수
+    let currentX = startX;
     let currentY = startY;
-    let velocityY = 0; // 초기 속도
+    let velocityY = 0; // 수직 초기 속도
     const gravity = 0.5; // 중력 가속도
     const baseSpeed = 100 / speed; // 속도 설정에 따른 기본 속도
+    const horizontalSpeed = velocityX * (baseSpeed / 50); // 수평 속도도 속도 설정에 맞춤
     
-    // 애니메이션 시작 (중력 효과 적용)
+    // 애니메이션 시작 (중력 효과 및 수평 이동 적용)
     const animationInterval = setInterval(() => {
         if (!gameState.isPlaying) {
             clearInterval(animationInterval);
             return;
         }
         
-        // 중력에 의한 가속
+        // 중력에 의한 수직 가속
         velocityY += gravity * baseSpeed;
         currentY += velocityY;
         
+        // 수평 이동 (왼쪽/오른쪽 방향)
+        currentX += horizontalSpeed;
+        
+        letterElement.style.left = currentX + 'px';
         letterElement.style.top = currentY + 'px';
         
-        // 화면 밖으로 나가면 제거
-        if (currentY > gameAreaHeight + 50) {
+        // 화면 밖으로 나가면 제거 (아래쪽 또는 좌우 측면)
+        if (currentY > gameAreaHeight + 50 || 
+            currentX < -50 || 
+            currentX > gameAreaWidth + 50) {
             clearInterval(animationInterval);
             const index = gameState.animationIntervals.indexOf(animationInterval);
             if (index > -1) {

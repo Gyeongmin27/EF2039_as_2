@@ -113,26 +113,12 @@ function startGame() {
 // 글자 떨어뜨리기 시작
 function startFallingLetters() {
     const letters = splitWord(gameState.currentWord);
-    const allPositions = ['top', 'left', 'right']; // 위, 왼쪽, 오른쪽
     const speed = speedSettings[gameState.currentSpeed] || 50;
     
-    // 글자 수만큼 방향을 랜덤으로 선택 (중복 없이)
-    const selectedPositions = [];
-    const availablePositions = [...allPositions]; // 복사본 생성
-    
-    for (let i = 0; i < letters.length; i++) {
-        if (availablePositions.length === 0) {
-            // 모든 방향을 사용했으면 다시 채움
-            availablePositions.push(...allPositions);
-        }
-        const randomIndex = Math.floor(Math.random() * availablePositions.length);
-        selectedPositions.push(availablePositions[randomIndex]);
-        availablePositions.splice(randomIndex, 1); // 선택된 방향 제거
-    }
-    
+    // 모든 글자를 위에서 떨어뜨림
     letters.forEach((letter, index) => {
         setTimeout(() => {
-            createFallingLetter(letter, selectedPositions[index], speed);
+            createFallingLetter(letter, speed);
         }, index * 300); // 각 글자를 약간씩 지연시켜 떨어뜨림
     });
     
@@ -146,7 +132,7 @@ function startFallingLetters() {
 }
 
 // 떨어지는 글자 생성
-function createFallingLetter(letter, position, speed) {
+function createFallingLetter(letter, speed) {
     if (!gameState.isPlaying) return; // 게임이 종료되면 생성하지 않음
     
     const letterElement = document.createElement('div');
@@ -156,34 +142,9 @@ function createFallingLetter(letter, position, speed) {
     const gameAreaWidth = gameArea.offsetWidth;
     const gameAreaHeight = gameArea.offsetHeight;
     
-    // 시작 위치 설정 (사각형의 가장자리에서 발사)
-    let startX, startY;
-    let velocityX = 0; // 수평 초기 속도
-    
-    switch(position) {
-        case 'top':
-            // 위쪽 변의 중간에서 발사 (아래 방향으로)
-            startX = gameAreaWidth / 2;
-            startY = 0;
-            velocityX = 0;
-            break;
-        case 'left':
-            // 왼쪽 변의 중간에서 발사 (오른쪽 방향으로)
-            startX = 0;
-            startY = gameAreaHeight / 2;
-            velocityX = 5; // 오른쪽 방향 속도
-            break;
-        case 'right':
-            // 오른쪽 변의 중간에서 발사 (왼쪽 방향으로)
-            startX = gameAreaWidth;
-            startY = gameAreaHeight / 2;
-            velocityX = -5; // 왼쪽 방향 속도
-            break;
-        default:
-            startX = gameAreaWidth / 2;
-            startY = 0;
-            velocityX = 0;
-    }
+    // 위쪽 변의 중간에서 발사 (아래 방향으로만)
+    const startX = gameAreaWidth / 2;
+    const startY = 0;
     
     letterElement.style.left = startX + 'px';
     letterElement.style.top = startY + 'px';
@@ -193,14 +154,12 @@ function createFallingLetter(letter, position, speed) {
     gameState.fallingLetters.push(letterElement);
     
     // 중력 시뮬레이션을 위한 물리 변수
-    let currentX = startX;
     let currentY = startY;
     let velocityY = 0; // 수직 초기 속도
     const gravity = 0.5; // 중력 가속도
     const baseSpeed = 100 / speed; // 속도 설정에 따른 기본 속도
-    const horizontalSpeed = velocityX * (baseSpeed / 50); // 수평 속도도 속도 설정에 맞춤
     
-    // 애니메이션 시작 (중력 효과 및 수평 이동 적용)
+    // 애니메이션 시작 (중력 효과만 적용)
     const animationInterval = setInterval(() => {
         if (!gameState.isPlaying) {
             clearInterval(animationInterval);
@@ -211,16 +170,10 @@ function createFallingLetter(letter, position, speed) {
         velocityY += gravity * baseSpeed;
         currentY += velocityY;
         
-        // 수평 이동 (왼쪽/오른쪽 방향)
-        currentX += horizontalSpeed;
-        
-        letterElement.style.left = currentX + 'px';
         letterElement.style.top = currentY + 'px';
         
-        // 화면 밖으로 나가면 제거 (아래쪽 또는 좌우 측면)
-        if (currentY > gameAreaHeight + 50 || 
-            currentX < -50 || 
-            currentX > gameAreaWidth + 50) {
+        // 화면 밖으로 나가면 제거
+        if (currentY > gameAreaHeight + 50) {
             clearInterval(animationInterval);
             const index = gameState.animationIntervals.indexOf(animationInterval);
             if (index > -1) {

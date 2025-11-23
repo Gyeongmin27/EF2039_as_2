@@ -162,21 +162,21 @@ function createFallingLetter(letter, position, speed) {
     
     switch(position) {
         case 'top':
-            // 위쪽 중앙에서 발사 (수직으로만 떨어짐)
+            // 위쪽 변의 중간에서 발사 (아래 방향으로)
             startX = gameAreaWidth / 2;
             startY = 0;
             velocityX = 0;
             break;
         case 'left':
-            // 왼쪽 가장자리 위에서 발사 (오른쪽 방향으로)
+            // 왼쪽 변의 중간에서 발사 (오른쪽 방향으로)
             startX = 0;
-            startY = 0;
+            startY = gameAreaHeight / 2;
             velocityX = 5; // 오른쪽 방향 속도
             break;
         case 'right':
-            // 오른쪽 가장자리 위에서 발사 (왼쪽 방향으로)
+            // 오른쪽 변의 중간에서 발사 (왼쪽 방향으로)
             startX = gameAreaWidth;
-            startY = 0;
+            startY = gameAreaHeight / 2;
             velocityX = -5; // 왼쪽 방향 속도
             break;
         default:

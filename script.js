@@ -115,15 +115,22 @@ function startFallingLetters() {
     const letters = splitWord(gameState.currentWord);
     const speed = speedSettings[gameState.currentSpeed] || 50;
     
-    // 모든 글자를 위에서 떨어뜨림
-    letters.forEach((letter, index) => {
+    // 글자 순서를 랜덤으로 섞기
+    const shuffledLetters = [...letters];
+    for (let i = shuffledLetters.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledLetters[i], shuffledLetters[j]] = [shuffledLetters[j], shuffledLetters[i]];
+    }
+    
+    // 랜덤 순서로 글자를 떨어뜨림
+    shuffledLetters.forEach((letter, index) => {
         setTimeout(() => {
             createFallingLetter(letter, speed);
         }, index * 300); // 각 글자를 약간씩 지연시켜 떨어뜨림
     });
     
     // 모든 글자가 떨어진 후 입력 화면 표시
-    const totalDelay = letters.length * 300 + 2000; // 마지막 글자 떨어진 후 2초 대기
+    const totalDelay = shuffledLetters.length * 300 + 2000; // 마지막 글자 떨어진 후 2초 대기
     setTimeout(() => {
         if (gameState.isPlaying) {
             showInputSection();
@@ -142,8 +149,11 @@ function createFallingLetter(letter, speed) {
     const gameAreaWidth = gameArea.offsetWidth;
     const gameAreaHeight = gameArea.offsetHeight;
     
-    // 위쪽 변의 중간에서 발사 (아래 방향으로만)
-    const startX = gameAreaWidth / 2;
+    // 중앙 주변 랜덤 위치에서 발사 (가장자리 제외: 20%~80% 범위)
+    const margin = gameAreaWidth * 0.2; // 화면의 20%를 가장자리로 간주
+    const minX = margin;
+    const maxX = gameAreaWidth - margin;
+    const startX = minX + Math.random() * (maxX - minX);
     const startY = 0;
     
     letterElement.style.left = startX + 'px';

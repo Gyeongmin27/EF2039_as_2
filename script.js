@@ -277,17 +277,23 @@ function showResult(isCorrect, correctAnswer, userAnswer) {
         const resultMessage = document.getElementById('result-message');
         const correctAnswerSpan = document.getElementById('correct-answer');
         const userAnswerSpan = document.getElementById('user-answer');
+        const finalScoreInfo = document.getElementById('final-score-info');
+        const finalScoreSpan = document.getElementById('final-score');
         
         resultTitle.textContent = '틀렸습니다';
         resultTitle.className = 'failure';
         resultMessage.textContent = '다시 시도해보세요!';
         
-        // 점수 초기화
-        gameState.score = 0;
-        currentScoreDisplay.textContent = gameState.score;
+        // 획득한 점수 표시
+        finalScoreSpan.textContent = gameState.score;
+        finalScoreInfo.style.display = 'block';
         
         correctAnswerSpan.textContent = correctAnswer;
         userAnswerSpan.textContent = userAnswer || '(입력 없음)';
+        
+        // 점수 초기화
+        gameState.score = 0;
+        currentScoreDisplay.textContent = gameState.score;
     }
 }
 

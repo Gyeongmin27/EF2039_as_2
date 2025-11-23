@@ -70,14 +70,14 @@ The core purpose is to test and improve users' ability to recognize and remember
   - Low difficulty: Simple characters (4 or fewer strokes)
   - Provide UI for users to select difficulty level
 
-#### 3.1.3 Multi-directional Character Falling
+#### 3.1.3 Character Falling
 
 - **Priority**: Must-have
-- **Description**: Animation where each character falls from top, left, and right of the monitor
+- **Description**: Animation where characters fall from the top of the screen
 - **Detailed Requirements**:
-  - Each character starts from top, top-left, or top-right of the screen
+  - Each character starts from a random position near the center of the top edge (excluding edges: 20%~80% of screen width)
   - Natural falling animation with gravity effects applied
-  - Characters start from different positions and fall simultaneously
+  - Characters fall in random order
   - Characters disappear when they reach the bottom of the screen
 
 #### 3.1.4 Falling Speed Control
@@ -95,17 +95,18 @@ The core purpose is to test and improve users' ability to recognize and remember
 - **Description**: Feature allowing users to input words after all characters have fallen
 - **Detailed Requirements**:
   - Display input field
-  - Display 1.5-second time limit timer
+  - Display 1.5-second time limit timer (updates every 0.1 seconds)
   - Submit via submit button or Enter key
   - Auto-submit on timeout
 
 #### 3.1.6 Scoring System
 
 - **Priority**: Must-have
-- **Description**: Score increases on correct answer, game ends on incorrect answer
+- **Description**: Score increases and automatically proceeds to next round on correct answer, game ends on incorrect answer
 - **Detailed Requirements**:
   - Score increases on correct answer (different points based on difficulty)
-  - Return to initial screen on incorrect answer
+  - Automatically proceed to next round without result screen on correct answer
+  - Display earned score before returning to initial screen on incorrect answer
   - Real-time display of current score
 
 #### 3.1.7 Game Restart Feature
@@ -285,6 +286,7 @@ The core purpose is to test and improve users' ability to recognize and remember
   - 1.5-second timer feature
   - Correct/incorrect answer determination logic
   - Scoring system implementation
+  - Auto-proceed to next round on correct answer feature
 - **Completion Criteria**: Game works in complete cycle
 
 ### Milestone 5: UI/UX Improvement and Final Testing

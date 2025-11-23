@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동체시력 테스트 - 메인</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <h1>동체시력 테스트</h1>
+            <ul>
+                <li><a href="index.html" class="active">게임</a></li>
+                <li><a href="settings.html">설정</a></li>
+                <li><a href="about.html">소개</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="game-container">
+            <div id="start-screen" class="screen active">
+                <h2>동체시력 테스트 게임</h2>
+                <p class="description">여러 방향에서 떨어지는 글자를 보고 단어를 완성하세요!</p>
+                <div class="current-settings">
+                    <p>현재 설정</p>
+                    <div class="setting-info">
+                        <span>난이도: <span id="current-difficulty">중</span></span>
+                        <span>속도: <span id="current-speed">중</span></span>
+                    </div>
+                </div>
+                <div class="score-display">
+                    <p>현재 점수: <span id="current-score">0</span></p>
+                </div>
+                <button id="start-btn" class="btn btn-primary">게임 시작</button>
+            </div>
+
+            <div id="game-screen" class="screen">
+                <div class="game-info">
+                    <div class="score-info">점수: <span id="game-score">0</span></div>
+                    <div class="timer-info">남은 시간: <span id="timer">3</span>초</div>
+                </div>
+                <div id="game-area" class="game-area">
+                    <!-- 글자들이 떨어지는 영역 -->
+                </div>
+                <div id="input-section" class="input-section" style="display: none;">
+                    <input type="text" id="word-input" placeholder="단어를 입력하세요" autocomplete="off">
+                    <button id="submit-btn" class="btn btn-primary">제출</button>
+                </div>
+            </div>
+
+            <div id="result-screen" class="screen">
+                <h2 id="result-title"></h2>
+                <p id="result-message"></p>
+                <div class="result-info">
+                    <p>정답: <span id="correct-answer"></span></p>
+                    <p>입력한 답: <span id="user-answer"></span></p>
+                </div>
+                <button id="restart-btn" class="btn btn-primary">다시 시작</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 동체시력 테스트 게임</p>
+    </footer>
+
+    <script src="words.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동체시력 테스트 - 설정</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <h1>동체시력 테스트</h1>
+            <ul>
+                <li><a href="index.html">게임</a></li>
+                <li><a href="settings.html" class="active">설정</a></li>
+                <li><a href="about.html">소개</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="settings-container">
+            <h2>게임 설정</h2>
+            
+            <div class="setting-group">
+                <label for="difficulty-select">난이도</label>
+                <select id="difficulty-select" class="setting-control">
+                    <option value="하">하 (간단한 글자)</option>
+                    <option value="중" selected>중 (중간 복잡도)</option>
+                    <option value="상">상 (복잡한 글자)</option>
+                </select>
+                <p class="setting-description">글자의 복잡도(획수)에 따라 난이도가 결정됩니다.</p>
+            </div>
+
+            <div class="setting-group">
+                <label for="speed-select">떨어지는 속도</label>
+                <select id="speed-select" class="setting-control">
+                    <option value="느림">느림</option>
+                    <option value="중" selected>중</option>
+                    <option value="빠름">빠름</option>
+                    <option value="매우빠름">매우 빠름</option>
+                </select>
+                <p class="setting-description">글자가 떨어지는 속도를 조절할 수 있습니다.</p>
+            </div>
+
+            <div class="setting-actions">
+                <button id="save-settings-btn" class="btn btn-primary">설정 저장</button>
+                <button id="reset-settings-btn" class="btn btn-secondary">기본값으로 복원</button>
+            </div>
+
+            <div class="settings-info">
+                <h3>설정 설명</h3>
+                <ul>
+                    <li><strong>난이도 하:</strong> 획수 4개 이하의 간단한 글자</li>
+                    <li><strong>난이도 중:</strong> 획수 5-9개의 중간 복잡도 글자</li>
+                    <li><strong>난이도 상:</strong> 획수 10개 이상의 복잡한 글자</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 동체시력 테스트 게임</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // 설정 페이지 전용 스크립트
+        document.addEventListener('DOMContentLoaded', function() {
+            // 저장된 설정 불러오기
+            const savedDifficulty = localStorage.getItem('gameDifficulty') || '중';
+            const savedSpeed = localStorage.getItem('gameSpeed') || '중';
+            
+            document.getElementById('difficulty-select').value = savedDifficulty;
+            document.getElementById('speed-select').value = savedSpeed;
+
+            // 설정 저장 버튼
+            document.getElementById('save-settings-btn').addEventListener('click', function() {
+                const difficulty = document.getElementById('difficulty-select').value;
+                const speed = document.getElementById('speed-select').value;
+                
+                localStorage.setItem('gameDifficulty', difficulty);
+                localStorage.setItem('gameSpeed', speed);
+                
+                alert('설정이 저장되었습니다!');
+            });
+
+            // 기본값 복원 버튼
+            document.getElementById('reset-settings-btn').addEventListener('click', function() {
+                localStorage.setItem('gameDifficulty', '중');
+                localStorage.setItem('gameSpeed', '중');
+                
+                document.getElementById('difficulty-select').value = '중';
+                document.getElementById('speed-select').value = '중';
+                
+                alert('기본값으로 복원되었습니다!');
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -6,7 +6,7 @@ let gameState = {
     score: 0,
     isPlaying: false,
     timer: null,
-    timeLeft: 3,
+    timeLeft: 1.5,
     fallingLetters: [],
     animationIntervals: [] // 애니메이션 인터벌 추적
 };
@@ -85,7 +85,7 @@ function startGame() {
     // 게임 상태 초기화
     gameState.isPlaying = true;
     gameState.currentWord = getRandomWord(gameState.currentDifficulty);
-    gameState.timeLeft = 3;
+    gameState.timeLeft = 1.5;
     gameState.fallingLetters = [];
     
     // 화면 전환
@@ -139,47 +139,61 @@ function createFallingLetter(letter, position, speed) {
     letterElement.className = 'falling-letter';
     letterElement.textContent = letter;
     
-    // 시작 위치 설정 (퍼센트 기반)
-    let startXPercent;
+    const gameAreaWidth = gameArea.offsetWidth;
+    const gameAreaHeight = gameArea.offsetHeight;
+    
+    // 시작 위치 설정 (사각형의 가장자리에서 발사)
+    let startX, startY;
     
     switch(position) {
         case 'top':
-            startXPercent = 50; // 중앙
+            // 위쪽 중앙에서 발사
+            startX = gameAreaWidth / 2;
+            startY = 0;
             break;
         case 'left':
-            startXPercent = 20; // 왼쪽
+            // 왼쪽 가장자리 위에서 발사
+            startX = 0;
+            startY = 0;
             break;
         case 'right':
-            startXPercent = 80; // 오른쪽
+            // 오른쪽 가장자리 위에서 발사
+            startX = gameAreaWidth;
+            startY = 0;
             break;
         default:
-            startXPercent = 50;
+            startX = gameAreaWidth / 2;
+            startY = 0;
     }
     
-    letterElement.style.left = startXPercent + '%';
-    letterElement.style.top = '0px';
-    letterElement.style.transform = 'translateX(-50%)'; // 중앙 정렬
+    letterElement.style.left = startX + 'px';
+    letterElement.style.top = startY + 'px';
+    letterElement.style.transform = 'translate(-50%, -50%)'; // 중앙 정렬
     
     gameArea.appendChild(letterElement);
     gameState.fallingLetters.push(letterElement);
     
-    // 애니메이션 시작
-    let currentY = 0;
-    const gameAreaHeight = gameArea.offsetHeight;
-    // 속도에 따라 떨어지는 거리 조절 (작을수록 빠름)
-    const fallSpeed = 100 / speed; // speed가 작을수록 fallSpeed가 커짐
+    // 중력 시뮬레이션을 위한 물리 변수
+    let currentY = startY;
+    let velocityY = 0; // 초기 속도
+    const gravity = 0.5; // 중력 가속도
+    const baseSpeed = 100 / speed; // 속도 설정에 따른 기본 속도
     
+    // 애니메이션 시작 (중력 효과 적용)
     const animationInterval = setInterval(() => {
         if (!gameState.isPlaying) {
             clearInterval(animationInterval);
             return;
         }
         
-        currentY += fallSpeed;
+        // 중력에 의한 가속
+        velocityY += gravity * baseSpeed;
+        currentY += velocityY;
+        
         letterElement.style.top = currentY + 'px';
         
         // 화면 밖으로 나가면 제거
-        if (currentY > gameAreaHeight) {
+        if (currentY > gameAreaHeight + 50) {
             clearInterval(animationInterval);
             const index = gameState.animationIntervals.indexOf(animationInterval);
             if (index > -1) {
@@ -209,18 +223,21 @@ function showInputSection() {
 
 // 타이머 시작
 function startTimer() {
-    gameState.timeLeft = 3;
-    timerDisplay.textContent = gameState.timeLeft;
+    gameState.timeLeft = 1.5;
+    timerDisplay.textContent = gameState.timeLeft.toFixed(1);
     
     gameState.timer = setInterval(() => {
-        gameState.timeLeft--;
-        timerDisplay.textContent = gameState.timeLeft;
+        gameState.timeLeft -= 0.1;
+        if (gameState.timeLeft < 0) {
+            gameState.timeLeft = 0;
+        }
+        timerDisplay.textContent = gameState.timeLeft.toFixed(1);
         
         if (gameState.timeLeft <= 0) {
             clearInterval(gameState.timer);
             submitAnswer(); // 시간 초과 시 자동 제출
         }
-    }, 1000);
+    }, 100); // 0.1초마다 업데이트
 }
 
 // 답안 제출
@@ -248,33 +265,105 @@ function submitAnswer() {
 
 // 결과 화면 표시
 function showResult(isCorrect, correctAnswer, userAnswer) {
-    gameScreen.classList.remove('active');
-    resultScreen.classList.add('active');
-    
-    const resultTitle = document.getElementById('result-title');
-    const resultMessage = document.getElementById('result-message');
-    const correctAnswerSpan = document.getElementById('correct-answer');
-    const userAnswerSpan = document.getElementById('user-answer');
-    
     if (isCorrect) {
-        resultTitle.textContent = '정답입니다!';
-        resultTitle.className = 'success';
-        resultMessage.textContent = '축하합니다! 점수가 올라갑니다.';
-        
-        // 점수 증가
+        // 정답일 경우 점수 증가하고 바로 다음 라운드 시작
         gameState.score += scoreSettings[gameState.currentDifficulty] || 20;
         currentScoreDisplay.textContent = gameState.score;
+        gameScoreDisplay.textContent = gameState.score;
+        
+        // 짧은 성공 메시지 표시 후 바로 다음 라운드
+        showSuccessMessage();
+        
+        // 0.5초 후 다음 라운드 시작
+        setTimeout(() => {
+            startNextRound();
+        }, 500);
     } else {
+        // 오답일 경우 결과 화면 표시
+        gameScreen.classList.remove('active');
+        resultScreen.classList.add('active');
+        
+        const resultTitle = document.getElementById('result-title');
+        const resultMessage = document.getElementById('result-message');
+        const correctAnswerSpan = document.getElementById('correct-answer');
+        const userAnswerSpan = document.getElementById('user-answer');
+        
         resultTitle.textContent = '틀렸습니다';
         resultTitle.className = 'failure';
         resultMessage.textContent = '다시 시도해보세요!';
         
-        // 점수 초기화 (요구사항에 따라)
+        // 점수 초기화
         gameState.score = 0;
+        currentScoreDisplay.textContent = gameState.score;
+        
+        correctAnswerSpan.textContent = correctAnswer;
+        userAnswerSpan.textContent = userAnswer || '(입력 없음)';
+    }
+}
+
+// 성공 메시지 표시 (간단한 피드백)
+function showSuccessMessage() {
+    const messageElement = document.createElement('div');
+    messageElement.textContent = '정답!';
+    messageElement.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #52C41A;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-size: 2rem;
+        font-weight: 700;
+        z-index: 1000;
+        animation: fadeOut 0.5s ease-out forwards;
+    `;
+    
+    // CSS 애니메이션 추가
+    if (!document.getElementById('success-animation-style')) {
+        const style = document.createElement('style');
+        style.id = 'success-animation-style';
+        style.textContent = `
+            @keyframes fadeOut {
+                0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            }
+        `;
+        document.head.appendChild(style);
     }
     
-    correctAnswerSpan.textContent = correctAnswer;
-    userAnswerSpan.textContent = userAnswer || '(입력 없음)';
+    document.body.appendChild(messageElement);
+    
+    setTimeout(() => {
+        if (messageElement.parentNode) {
+            messageElement.parentNode.removeChild(messageElement);
+        }
+    }, 500);
+}
+
+// 다음 라운드 시작
+function startNextRound() {
+    // 게임 영역 초기화
+    gameArea.innerHTML = '';
+    wordInput.value = '';
+    wordInput.style.display = 'none';
+    submitBtn.style.display = 'none';
+    document.getElementById('input-section').style.display = 'none';
+    
+    // 애니메이션 인터벌 배열 초기화
+    gameState.animationIntervals = [];
+    gameState.fallingLetters = [];
+    
+    // 새로운 단어 선택
+    gameState.isPlaying = true;
+    gameState.currentWord = getRandomWord(gameState.currentDifficulty);
+    
+    // 점수 표시 업데이트
+    gameScoreDisplay.textContent = gameState.score;
+    
+    // 다음 라운드 시작
+    startFallingLetters();
 }
 
 // 처음 화면으로 리셋
